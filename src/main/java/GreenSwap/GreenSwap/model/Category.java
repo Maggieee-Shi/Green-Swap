@@ -1,18 +1,18 @@
 package GreenSwap.GreenSwap.model;
 
 public class Category {
-  private long categoryId;
+  private Long categoryId;
 
-  public long getCategoryId() {
+  public Long getCategoryId() {
     return categoryId;
   }
 
-  public Category(long categoryId, String categoryName) {
+  public Category(Long categoryId, String categoryName) {
     this.categoryId = categoryId;
     this.categoryName = categoryName;
   }
 
-  public void setCategoryId(long categoryId) {
+  public void setCategoryId(Long categoryId) {
     this.categoryId = categoryId;
   }
 
