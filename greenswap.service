@@ -1,0 +1,21 @@
+[Unit]
+Description=GreenSwap Backend
+After=network.target
+
+[Service]
+User=ec2-user
+WorkingDirectory=/opt/greenswap
+ExecStart=/usr/bin/java -jar /opt/greenswap/GreenSwap-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
+Environment="RDS_HOSTNAME=greenswap-db.cz0oqiysam3d.us-west-1.rds.amazonaws.com"
+Environment="RDS_PORT=5432"
+Environment="RDS_DB_NAME=greenswapdb"
+Environment="RDS_USERNAME=greenswap"
+Environment="RDS_PASSWORD=GreenSwap2024!"
+Environment="CORS_ALLOWED_ORIGIN=https://PLACEHOLDER"
+Environment="STRIPE_API_KEY=sk_test_placeholder"
+Environment="STRIPE_WEBHOOK_SECRET=whsec_placeholder"
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
