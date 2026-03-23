@@ -1,3 +1,16 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://54-67-22-26.sslip.io/api/:path*"
+    },
+    {
+      "source": "/uploads/:path*",
+      "destination": "https://54-67-22-26.sslip.io/uploads/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
