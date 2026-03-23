@@ -8,6 +8,9 @@ import GreenSwap.GreenSwap.enums.ProductCondition;
 import GreenSwap.GreenSwap.exception.ResourceNotFoundException;
 import GreenSwap.GreenSwap.model.Product;
 import GreenSwap.GreenSwap.model.User;
+import GreenSwap.GreenSwap.model.Conversation;
+import GreenSwap.GreenSwap.repository.ConversationRepository;
+import GreenSwap.GreenSwap.repository.MessageRepository;
 import GreenSwap.GreenSwap.repository.OrderItemRepository;
 import GreenSwap.GreenSwap.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,8 @@ public class ProductServiceImpl {
 
     private final ProductRepository productRepository;
     private final OrderItemRepository orderItemRepository;
+    private final ConversationRepository conversationRepository;
+    private final MessageRepository messageRepository;
 
     @Transactional(readOnly = true)
     public List<ProductResponse> findAll(String category, String condition,
@@ -84,6 +89,11 @@ public class ProductServiceImpl {
             .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
         if (!isAdmin && !product.getSeller().getId().equals(currentUser.getId())) {
             throw new org.springframework.security.access.AccessDeniedException("You don't own this listing");
+        }
+        List<Conversation> convs = conversationRepository.findByProductId(id);
+        if (!convs.isEmpty()) {
+            messageRepository.deleteByConversationIn(convs);
+            conversationRepository.deleteAll(convs);
         }
         orderItemRepository.nullifyProduct(id);
         productRepository.deleteById(id);
