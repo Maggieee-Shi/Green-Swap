@@ -68,9 +68,14 @@ public class ProductServiceImpl {
     }
 
     @Transactional
-    public ProductResponse update(Long id, UpdateProductRequest request) {
+    public ProductResponse update(Long id, UpdateProductRequest request, User currentUser) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + id));
+        boolean isAdmin = currentUser.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        if (!isAdmin && !product.getSeller().getId().equals(currentUser.getId())) {
+            throw new org.springframework.security.access.AccessDeniedException("You don't own this listing");
+        }
         if (request.getName() != null) product.setName(request.getName());
         if (request.getDescription() != null) product.setDescription(request.getDescription());
         if (request.getPrice() != null) product.setPrice(request.getPrice());
@@ -78,6 +83,10 @@ public class ProductServiceImpl {
         if (request.getCategory() != null) product.setCategory(parseCategory(request.getCategory()));
         if (request.getCondition() != null) product.setCondition(parseCondition(request.getCondition()));
         if (request.getImageUrl() != null) product.setImageUrl(request.getImageUrl());
+        if (request.getSold() != null) {
+            product.setSold(request.getSold());
+            product.setInventory(request.getSold() ? 0 : 1);
+        }
         return ProductResponse.from(productRepository.save(product));
     }
 
@@ -105,23 +114,6 @@ public class ProductServiceImpl {
                 .stream()
                 .map(ProductResponse::from)
                 .collect(Collectors.toList());
-    }
-
-    @Transactional
-    public ProductResponse markAsSold(Long id, User currentUser) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + id));
-        if (product.getSeller() == null || !product.getSeller().getId().equals(currentUser.getId())) {
-            throw new org.springframework.security.access.AccessDeniedException("You don't own this listing");
-        }
-        if (product.isSold()) {
-            product.setSold(false);
-            product.setInventory(1);
-        } else {
-            product.setSold(true);
-            product.setInventory(0);
-        }
-        return ProductResponse.from(productRepository.save(product));
     }
 
     private ProductCategory parseCategory(String category) {

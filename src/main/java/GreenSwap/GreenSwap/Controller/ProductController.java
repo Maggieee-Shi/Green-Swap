@@ -44,11 +44,12 @@ public class ProductController {
         return ResponseEntity.ok(productService.create(request, currentUser));
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<ProductResponse> update(
             @PathVariable Long id,
-            @RequestBody UpdateProductRequest request) {
-        return ResponseEntity.ok(productService.update(id, request));
+            @RequestBody UpdateProductRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(productService.update(id, request, currentUser));
     }
 
     @DeleteMapping("/{id}")
@@ -64,10 +65,4 @@ public class ProductController {
         return ResponseEntity.ok(productService.findBySeller(currentUser));
     }
 
-    @PatchMapping("/{id}/sold")
-    public ResponseEntity<ProductResponse> markAsSold(
-            @PathVariable Long id,
-            @AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(productService.markAsSold(id, currentUser));
-    }
 }

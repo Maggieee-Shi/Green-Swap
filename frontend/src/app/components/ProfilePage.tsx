@@ -105,13 +105,16 @@ export function ProfilePage() {
     setOrders(stored);
   }, []);
 
-  const markAsSold = async (id: string) => {
+  const markAsSold = async (id: string, currentlySold: boolean) => {
     try {
-      const updated = await apiFetch<Listing>(`/products/${id}/sold`, { method: "PATCH" });
+      const updated = await apiFetch<Listing>(`/products/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ sold: !currentlySold }),
+      });
       setListings((prev) => prev.map((l) => (l.id === id ? updated : l)));
-      toast.success("Marked as sold!");
+      toast.success(currentlySold ? "Marked as active!" : "Marked as sold!");
     } catch {
-      toast.error("Failed to mark as sold");
+      toast.error("Failed to update listing");
     }
   };
 
@@ -233,7 +236,7 @@ export function ProfilePage() {
                                   Sold
                                 </Badge>
                                 <Button size="sm" variant="outline" className="text-xs h-7 px-2"
-                                  onClick={() => markAsSold(listing.id)}>
+                                  onClick={() => markAsSold(listing.id, true)}>
                                   Mark Active
                                 </Button>
                               </>
@@ -243,7 +246,7 @@ export function ProfilePage() {
                                   Active
                                 </Badge>
                                 <Button size="sm" variant="outline" className="text-xs h-7 px-2"
-                                  onClick={() => markAsSold(listing.id)}>
+                                  onClick={() => markAsSold(listing.id, false)}>
                                   Mark Sold
                                 </Button>
                               </>

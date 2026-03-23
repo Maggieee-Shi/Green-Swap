@@ -13,4 +13,5 @@ public class UpdateProductRequest {
     private String category;
     private String condition;
     private String imageUrl;
+    private Boolean sold;
 }

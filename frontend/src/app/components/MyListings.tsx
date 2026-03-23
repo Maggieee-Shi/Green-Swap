@@ -31,13 +31,16 @@ export function MyListings() {
       .finally(() => setLoading(false));
   }, []);
 
-  const markAsSold = async (id: string) => {
+  const markAsSold = async (id: string, currentlySold: boolean) => {
     try {
-      const updated = await apiFetch<Listing>(`/products/${id}/sold`, { method: "PATCH" });
+      const updated = await apiFetch<Listing>(`/products/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ sold: !currentlySold }),
+      });
       setListings((prev) => prev.map((l) => (l.id === id ? updated : l)));
-      toast.success("Marked as sold!");
+      toast.success(currentlySold ? "Marked as active!" : "Marked as sold!");
     } catch {
-      toast.error("Failed to mark as sold");
+      toast.error("Failed to update listing");
     }
   };
 
@@ -132,7 +135,7 @@ export function MyListings() {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => markAsSold(listing.id)}
+                              onClick={() => markAsSold(listing.id, listing.sold)}
                             >
                               Mark as Sold
                             </Button>
