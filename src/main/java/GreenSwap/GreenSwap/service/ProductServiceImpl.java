@@ -8,6 +8,7 @@ import GreenSwap.GreenSwap.enums.ProductCondition;
 import GreenSwap.GreenSwap.exception.ResourceNotFoundException;
 import GreenSwap.GreenSwap.model.Product;
 import GreenSwap.GreenSwap.model.User;
+import GreenSwap.GreenSwap.repository.OrderItemRepository;
 import GreenSwap.GreenSwap.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl {
 
     private final ProductRepository productRepository;
+    private final OrderItemRepository orderItemRepository;
 
     @Transactional(readOnly = true)
     public List<ProductResponse> findAll(String category, String condition,
@@ -83,6 +85,7 @@ public class ProductServiceImpl {
         if (!isAdmin && !product.getSeller().getId().equals(currentUser.getId())) {
             throw new org.springframework.security.access.AccessDeniedException("You don't own this listing");
         }
+        orderItemRepository.nullifyProduct(id);
         productRepository.deleteById(id);
     }
 
@@ -101,8 +104,13 @@ public class ProductServiceImpl {
         if (product.getSeller() == null || !product.getSeller().getId().equals(currentUser.getId())) {
             throw new org.springframework.security.access.AccessDeniedException("You don't own this listing");
         }
-        product.setSold(true);
-        product.setInventory(0);
+        if (product.isSold()) {
+            product.setSold(false);
+            product.setInventory(1);
+        } else {
+            product.setSold(true);
+            product.setInventory(0);
+        }
         return ProductResponse.from(productRepository.save(product));
     }
 

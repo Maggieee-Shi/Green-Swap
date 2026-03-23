@@ -16,8 +16,8 @@ public class OrderItemResponse {
 
     public static OrderItemResponse from(OrderItem item) {
         OrderItemResponse r = new OrderItemResponse();
-        r.setProductId(String.valueOf(item.getProduct().getId()));
-        r.setProductName(item.getProduct().getName());
+        r.setProductId(item.getProduct() != null ? String.valueOf(item.getProduct().getId()) : null);
+        r.setProductName(item.getProduct() != null ? item.getProduct().getName() : "Deleted listing");
         r.setPriceAtPurchase(item.getPriceAtPurchase());
         r.setQuantity(item.getQuantity());
         return r;

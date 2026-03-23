@@ -121,8 +121,8 @@ export function ProfilePage() {
       await apiFetch<void>(`/products/${id}`, { method: "DELETE" });
       setListings((prev) => prev.filter((l) => l.id !== id));
       toast.success("Listing deleted");
-    } catch {
-      toast.error("Failed to delete listing");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete listing");
     }
   };
 
@@ -227,10 +227,16 @@ export function ProfilePage() {
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
                             {listing.sold ? (
-                              <Badge className="bg-slate-100 text-slate-600 border-slate-200" variant="outline">
-                                <CheckCircle className="mr-1 h-3 w-3" />
-                                Sold
-                              </Badge>
+                              <>
+                                <Badge className="bg-slate-100 text-slate-600 border-slate-200" variant="outline">
+                                  <CheckCircle className="mr-1 h-3 w-3" />
+                                  Sold
+                                </Badge>
+                                <Button size="sm" variant="outline" className="text-xs h-7 px-2"
+                                  onClick={() => markAsSold(listing.id)}>
+                                  Mark Active
+                                </Button>
+                              </>
                             ) : (
                               <>
                                 <Badge className="bg-green-50 text-green-700 border-green-200 text-xs" variant="outline">
