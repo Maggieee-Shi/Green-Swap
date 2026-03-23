@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Calendar,
   MapPin,
+  Trash2,
 } from "lucide-react";
 import { Header } from "./Header";
 import { Card, CardContent } from "./ui/card";
@@ -111,6 +112,17 @@ export function ProfilePage() {
       toast.success("Marked as sold!");
     } catch {
       toast.error("Failed to mark as sold");
+    }
+  };
+
+  const deleteListing = async (id: string) => {
+    if (!window.confirm("Delete this listing? This cannot be undone.")) return;
+    try {
+      await apiFetch<void>(`/products/${id}`, { method: "DELETE" });
+      setListings((prev) => prev.filter((l) => l.id !== id));
+      toast.success("Listing deleted");
+    } catch {
+      toast.error("Failed to delete listing");
     }
   };
 
@@ -230,6 +242,14 @@ export function ProfilePage() {
                                 </Button>
                               </>
                             )}
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                              onClick={() => deleteListing(listing.id)}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
                           </div>
                         </div>
                       </div>
