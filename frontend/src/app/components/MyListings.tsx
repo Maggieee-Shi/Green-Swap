@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { Plus, Package, CheckCircle } from "lucide-react";
+import { Plus, Package, CheckCircle, Trash2 } from "lucide-react";
 import { Header } from "./Header";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
@@ -38,6 +38,17 @@ export function MyListings() {
       toast.success("Marked as sold!");
     } catch {
       toast.error("Failed to mark as sold");
+    }
+  };
+
+  const deleteListing = async (id: string) => {
+    if (!window.confirm("Delete this listing? This cannot be undone.")) return;
+    try {
+      await apiFetch<void>(`/products/${id}`, { method: "DELETE" });
+      setListings((prev) => prev.filter((l) => l.id !== id));
+      toast.success("Listing deleted");
+    } catch {
+      toast.error("Failed to delete listing");
     }
   };
 
@@ -127,6 +138,14 @@ export function MyListings() {
                             </Button>
                           </>
                         )}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => deleteListing(listing.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                   </div>

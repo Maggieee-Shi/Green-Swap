@@ -75,9 +75,13 @@ public class ProductServiceImpl {
     }
 
     @Transactional
-    public void delete(Long id) {
-        if (!productRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Product not found: " + id);
+    public void delete(Long id, User currentUser) {
+        Product product = productRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + id));
+        boolean isAdmin = currentUser.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        if (!isAdmin && !product.getSeller().getId().equals(currentUser.getId())) {
+            throw new org.springframework.security.access.AccessDeniedException("You don't own this listing");
         }
         productRepository.deleteById(id);
     }
