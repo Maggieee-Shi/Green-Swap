@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { toast } from "sonner";
+import { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
 
 interface InventoryUpdate {
   productId: string;
@@ -9,72 +10,40 @@ interface InventoryUpdate {
 
 interface InventoryContextType {
   inventoryUpdates: Map<string, number>;
-  subscribeToInventory: () => void;
-  unsubscribeFromInventory: () => void;
 }
 
 const InventoryContext = createContext<InventoryContextType | undefined>(undefined);
 
 export function InventoryProvider({ children }: { children: ReactNode }) {
   const [inventoryUpdates, setInventoryUpdates] = useState<Map<string, number>>(new Map());
-  const [isSubscribed, setIsSubscribed] = useState(false);
+  const clientRef = useRef<Client | null>(null);
 
   useEffect(() => {
-    if (!isSubscribed) return;
+    const client = new Client({
+      webSocketFactory: () => new SockJS("/ws"),
+      reconnectDelay: 5000,
+      onConnect: () => {
+        client.subscribe("/topic/inventory", (message) => {
+          const update: InventoryUpdate = JSON.parse(message.body);
+          setInventoryUpdates((prev) => {
+            const next = new Map(prev);
+            next.set(update.productId, update.inventory);
+            return next;
+          });
+        });
+      },
+    });
 
-    // Simulate WebSocket STOMP connection for real-time inventory updates
-    console.log("🔌 WebSocket STOMP: Connected to /topic/inventory");
-    
-    // Simulate random inventory updates every 10-20 seconds
-    const interval = setInterval(() => {
-      const productIds = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
-      const randomProductId = productIds[Math.floor(Math.random() * productIds.length)];
-      const randomInventory = Math.floor(Math.random() * 5);
-      
-      const update: InventoryUpdate = {
-        productId: randomProductId,
-        inventory: randomInventory,
-        timestamp: Date.now(),
-      };
-      
-      console.log("📦 WebSocket STOMP: Inventory update received", update);
-      
-      setInventoryUpdates((prev) => {
-        const newMap = new Map(prev);
-        newMap.set(update.productId, update.inventory);
-        return newMap;
-      });
-      
-      // Show toast notification for low inventory
-      if (randomInventory <= 2 && randomInventory > 0) {
-        toast.warning(`Stock alert: Product ${randomProductId} - Only ${randomInventory} left!`);
-      } else if (randomInventory === 0) {
-        toast.error(`Product ${randomProductId} is now out of stock`);
-      }
-    }, 15000); // Update every 15 seconds
+    client.activate();
+    clientRef.current = client;
 
     return () => {
-      clearInterval(interval);
-      console.log("🔌 WebSocket STOMP: Disconnected from /topic/inventory");
+      client.deactivate();
     };
-  }, [isSubscribed]);
-
-  const subscribeToInventory = () => {
-    setIsSubscribed(true);
-  };
-
-  const unsubscribeFromInventory = () => {
-    setIsSubscribed(false);
-  };
+  }, []);
 
   return (
-    <InventoryContext.Provider
-      value={{
-        inventoryUpdates,
-        subscribeToInventory,
-        unsubscribeFromInventory,
-      }}
-    >
+    <InventoryContext.Provider value={{ inventoryUpdates }}>
       {children}
     </InventoryContext.Provider>
   );

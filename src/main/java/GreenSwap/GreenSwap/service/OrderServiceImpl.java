@@ -42,15 +42,8 @@ public class OrderServiceImpl {
         for (var itemReq : request.getItems()) {
             Long productId = Long.parseLong(itemReq.getProductId());
 
-            // Decide locking strategy: pessimistic for last-item, optimistic otherwise
-            Product product = productRepository.findById(productId)
+            Product product = productRepository.findByIdWithLock(productId)
                     .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productId));
-
-            if (product.getInventory() <= 1) {
-                // Re-fetch with exclusive lock for the critical single-item case
-                product = productRepository.findByIdWithLock(productId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productId));
-            }
 
             if (product.getInventory() < itemReq.getQuantity()) {
                 throw new InsufficientInventoryException(

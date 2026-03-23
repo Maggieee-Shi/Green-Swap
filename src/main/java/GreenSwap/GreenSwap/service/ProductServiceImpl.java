@@ -30,6 +30,7 @@ public class ProductServiceImpl {
     private final OrderItemRepository orderItemRepository;
     private final ConversationRepository conversationRepository;
     private final MessageRepository messageRepository;
+    private final InventoryWebSocketService inventoryWebSocketService;
 
     @Transactional(readOnly = true)
     public List<ProductResponse> findAll(String category, String condition,
@@ -87,7 +88,9 @@ public class ProductServiceImpl {
             product.setSold(request.getSold());
             product.setInventory(request.getSold() ? 0 : 1);
         }
-        return ProductResponse.from(productRepository.save(product));
+        Product saved = productRepository.save(product);
+        inventoryWebSocketService.broadcastInventoryUpdate(saved);
+        return ProductResponse.from(saved);
     }
 
     @Transactional
