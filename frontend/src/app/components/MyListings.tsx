@@ -47,8 +47,8 @@ export function MyListings() {
       await apiFetch<void>(`/products/${id}`, { method: "DELETE" });
       setListings((prev) => prev.filter((l) => l.id !== id));
       toast.success("Listing deleted");
-    } catch {
-      toast.error("Failed to delete listing");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete listing");
     }
   };
 
