@@ -42,7 +42,7 @@ public class OrderServiceImpl {
         for (var itemReq : request.getItems()) {
             Long productId = Long.parseLong(itemReq.getProductId());
 
-            Product product = productRepository.findByIdWithLock(productId)
+            Product product = productRepository.findById(productId)
                     .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productId));
 
             if (product.getInventory() < itemReq.getQuantity()) {
