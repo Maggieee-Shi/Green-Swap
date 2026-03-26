@@ -49,6 +49,7 @@
 /Users/maggieshi/Desktop/Resume/Projects/GreenSwap-self/GreenSwap/src/main/java/GreenSwap/GreenSwap/model/User.java
 /Users/maggieshi/Desktop/Resume/Projects/GreenSwap-self/GreenSwap/src/main/java/GreenSwap/GreenSwap/repository/ConversationRepository.java
 /Users/maggieshi/Desktop/Resume/Projects/GreenSwap-self/GreenSwap/src/main/java/GreenSwap/GreenSwap/repository/MessageRepository.java
+/Users/maggieshi/Desktop/Resume/Projects/GreenSwap-self/GreenSwap/src/main/java/GreenSwap/GreenSwap/repository/OrderItemRepository.java
 /Users/maggieshi/Desktop/Resume/Projects/GreenSwap-self/GreenSwap/src/main/java/GreenSwap/GreenSwap/repository/OrderRepository.java
 /Users/maggieshi/Desktop/Resume/Projects/GreenSwap-self/GreenSwap/src/main/java/GreenSwap/GreenSwap/repository/ProductRepository.java
 /Users/maggieshi/Desktop/Resume/Projects/GreenSwap-self/GreenSwap/src/main/java/GreenSwap/GreenSwap/repository/UserRepository.java

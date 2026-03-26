@@ -2,6 +2,7 @@ GreenSwap/GreenSwap/repository/MessageRepository.class
 GreenSwap/GreenSwap/dto/response/InventoryUpdateMessage.class
 GreenSwap/GreenSwap/dto/response/AuthResponse.class
 GreenSwap/GreenSwap/exception/GlobalExceptionHandler.class
+GreenSwap/GreenSwap/repository/OrderItemRepository.class
 GreenSwap/GreenSwap/model/Product.class
 GreenSwap/GreenSwap/dto/request/LoginRequest.class
 GreenSwap/GreenSwap/repository/UserRepository.class
