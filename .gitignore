@@ -1,0 +1,3 @@
+
+# SSH keys — never commit
+*.pem
